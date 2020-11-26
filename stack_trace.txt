@@ -1,0 +1,87 @@
+---------------------------------------------------------------------------
+FileNotFoundError                         Traceback (most recent call last)
+<ipython-input-21-84650bc59ee1> in <module>
+      4 # s3_input_train = sagemaker.TrainingInput(s3_data=train_location, content_type='csv')
+      5 # s3_input_train = sagemaker.s3.S3Uploader.upload( local_path = train_location, desired_s3_uri = prefix)
+----> 6 s3_input_train = session.upload_data(path = train_location, bucket = session.default_bucket(), key_prefix = prefix)
+      7 
+      8 # s3_input_validation = sagemaker.s3_input(s3_data=val_location, content_type='csv')
+
+~/anaconda3/envs/pytorch_p36/lib/python3.6/site-packages/sagemaker/session.py in upload_data(self, path, bucket, key_prefix, extra_args)
+    206 
+    207         for local_path, s3_key in files:
+--> 208             s3.Object(bucket, s3_key).upload_file(local_path, ExtraArgs=extra_args)
+    209 
+    210         s3_uri = "s3://{}/{}".format(bucket, key_prefix)
+
+~/anaconda3/envs/pytorch_p36/lib/python3.6/site-packages/boto3/s3/inject.py in object_upload_file(self, Filename, ExtraArgs, Callback, Config)
+    278     return self.meta.client.upload_file(
+    279         Filename=Filename, Bucket=self.bucket_name, Key=self.key,
+--> 280         ExtraArgs=ExtraArgs, Callback=Callback, Config=Config)
+    281 
+    282 
+
+~/anaconda3/envs/pytorch_p36/lib/python3.6/site-packages/boto3/s3/inject.py in upload_file(self, Filename, Bucket, Key, ExtraArgs, Callback, Config)
+    129         return transfer.upload_file(
+    130             filename=Filename, bucket=Bucket, key=Key,
+--> 131             extra_args=ExtraArgs, callback=Callback)
+    132 
+    133 
+
+~/anaconda3/envs/pytorch_p36/lib/python3.6/site-packages/boto3/s3/transfer.py in upload_file(self, filename, bucket, key, callback, extra_args)
+    277             filename, bucket, key, extra_args, subscribers)
+    278         try:
+--> 279             future.result()
+    280         # If a client error was raised, add the backwards compatibility layer
+    281         # that raises a S3UploadFailedError. These specific errors were only
+
+~/anaconda3/envs/pytorch_p36/lib/python3.6/site-packages/s3transfer/futures.py in result(self)
+    104             # however if a KeyboardInterrupt is raised we want want to exit
+    105             # out of this and propogate the exception.
+--> 106             return self._coordinator.result()
+    107         except KeyboardInterrupt as e:
+    108             self.cancel()
+
+~/anaconda3/envs/pytorch_p36/lib/python3.6/site-packages/s3transfer/futures.py in result(self)
+    263         # final result.
+    264         if self._exception:
+--> 265             raise self._exception
+    266         return self._result
+    267 
+
+~/anaconda3/envs/pytorch_p36/lib/python3.6/site-packages/s3transfer/tasks.py in _main(self, transfer_future, **kwargs)
+    253             # Call the submit method to start submitting tasks to execute the
+    254             # transfer.
+--> 255             self._submit(transfer_future=transfer_future, **kwargs)
+    256         except BaseException as e:
+    257             # If there was an exception raised during the submission of task
+
+~/anaconda3/envs/pytorch_p36/lib/python3.6/site-packages/s3transfer/upload.py in _submit(self, client, config, osutil, request_executor, transfer_future, bandwidth_limiter)
+    547         # Determine the size if it was not provided
+    548         if transfer_future.meta.size is None:
+--> 549             upload_input_manager.provide_transfer_size(transfer_future)
+    550 
+    551         # Do a multipart upload if needed, otherwise do a regular put object.
+
+~/anaconda3/envs/pytorch_p36/lib/python3.6/site-packages/s3transfer/upload.py in provide_transfer_size(self, transfer_future)
+    235         transfer_future.meta.provide_transfer_size(
+    236             self._osutil.get_file_size(
+--> 237                 transfer_future.meta.call_args.fileobj))
+    238 
+    239     def requires_multipart_upload(self, transfer_future, config):
+
+~/anaconda3/envs/pytorch_p36/lib/python3.6/site-packages/s3transfer/utils.py in get_file_size(self, filename)
+    243 
+    244     def get_file_size(self, filename):
+--> 245         return os.path.getsize(filename)
+    246 
+    247     def open_file_chunk_reader(self, filename, start_byte, size, callbacks):
+
+~/anaconda3/envs/pytorch_p36/lib/python3.6/genericpath.py in getsize(filename)
+     48 def getsize(filename):
+     49     """Return the size of a file, reported by os.stat()."""
+---> 50     return os.stat(filename).st_size
+     51 
+     52 
+
+FileNotFoundError: [Errno 2] No such file or directory: 's3://sagemaker-us-east-1-755969969602/boston-xgboost-HL/train.csv'
